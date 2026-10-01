@@ -389,7 +389,7 @@
         </label>
         <button class="primary" type="submit">Se connecter</button>
         <p id="login-error" role="alert" aria-live="polite"></p>
-        <p class="notice">Démo : demo@thermohabitat.fr / demo</p>
+        <p class="notice">Démo : demo@thermalcuve.fr / demo</p>
       </form>
     </section>
 
@@ -536,7 +536,7 @@
         const email = (loginEmail?.value || '').trim().toLowerCase();
         const password = loginPassword?.value || '';
 
-        if (email === 'demo@thermohabitat.fr' && password === 'demo') {
+        if (email === 'demo@thermalcuve.fr' && password === 'demo') {
           if (loginSection) loginSection.hidden = true;
           if (dashboard) dashboard.hidden = false;
         } else {
