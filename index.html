@@ -6,113 +6,636 @@
   <title>Thermal Cuve — Pilotage thermique</title>
   <link rel="icon" href="logo.png" type="image/png">
   <style>
-    :root{font-family:system-ui,sans-serif;color:#183247;background:#f3f7f8}*{box-sizing:border-box}body{margin:0}header{background:#123d50;color:white;padding:22px max(20px,calc((100% - 1000px)/2));display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}header strong{font-size:1.25rem}header p{margin:3px 0;color:#d1e2e8}.company{display:flex;align-items:center;gap:12px;text-align:right}.company-logo{width:52px;height:52px;object-fit:contain}.company-name{font-size:1.15rem!important}main{max-width:1000px;margin:28px auto;padding:0 18px}.heading{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}h1{font-size:1.55rem;margin:0}.online{color:#24764e;font-weight:650}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:15px}.card{background:white;border:1px solid #dce6e9;border-radius:12px;padding:19px;box-shadow:0 2px 8px #1832470c}.wide{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}h2{font-size:1.05rem;margin:0 0 10px}.muted{color:#647783;margin:4px 0}.badge{font-size:.8rem;color:#24764e;background:#e8f4ed;padding:4px 9px;border-radius:99px}.badge.warn{color:#995517;background:#fff2df}.zone-head{display:flex;align-items:center;justify-content:space-between;gap:8px}.reading{font-size:1.45rem;color:#176b87;font-weight:700}select,button{font:inherit;padding:8px 10px;border:1px solid #cfdbdf;border-radius:7px;background:white;color:inherit}label{font-size:.9rem}.mode{margin-top:12px}.control{display:flex;align-items:center;gap:10px;margin-top:15px}input[type=range]{flex:1;min-width:80px;accent-color:#176b87}output{min-width:48px;text-align:right;font-weight:700}.actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.primary{background:#176b87;color:white;border-color:#176b87;cursor:pointer}.primary:hover{background:#10566e}#message{min-height:1.5em;color:#24764e;font-weight:600}.notice{font-size:.86rem;color:#647783;margin-top:12px}@media(max-width:520px){main{margin-top:20px}}
-    .solar-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:14px 0}
-    .solar-metric{background:#f3f8f9;border-radius:9px;padding:13px}
-    .solar-metric strong{display:block;font-size:1.35rem;color:#176b87}
-    .forecast-wrap{overflow-x:auto}
-    .forecast{width:100%;border-collapse:collapse;margin-top:10px;text-align:left}
-    .forecast th,.forecast td{padding:9px;border-bottom:1px solid #e5edef;white-space:nowrap}
-    .forecast th{color:#647783;font-size:.85rem}
-    .forecast td:last-child{font-weight:650;color:#24764e}
+    :root {
+      --bg: #f3f7f8;
+      --surface: #ffffff;
+      --surface-soft: #f3f8f9;
+      --primary: #123d50;
+      --primary-2: #176b87;
+      --text: #183247;
+      --muted: #647783;
+      --line: #dce6e9;
+      --success: #24764e;
+      --warn: #b26f12;
+      --danger: #a32929;
+      --shadow: 0 12px 30px rgba(18, 61, 80, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    header {
+      background: var(--primary);
+      color: #fff;
+      padding: 22px max(20px, calc((100% - 1000px) / 2));
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    header strong {
+      font-size: 1.8rem;
+      display: block;
+    }
+
+    header p {
+      margin: 6px 0 0;
+      opacity: 0.85;
+      font-size: 0.95rem;
+    }
+
+    .company {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-align: right;
+    }
+
+    .company-name {
+      font-size: 1.2rem;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 28px 20px 50px;
+    }
+
+    .muted {
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .notice {
+      color: var(--muted);
+      font-size: 0.84rem;
+      margin: 12px 0 0;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .card.wide {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(220px, 260px);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .card h2 {
+      margin: 0 0 8px;
+      font-size: 1.2rem;
+    }
+
+    .reading {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--primary-2);
+      line-height: 1.2;
+      margin: 10px 0 0;
+    }
+
+    .heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 8px 0 22px;
+    }
+
+    .heading h1 {
+      margin: 0;
+      font-size: clamp(1.8rem, 2vw, 2.5rem);
+    }
+
+    .online {
+      color: var(--success);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .zone-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .zone-head h2 {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      background: #e1f3e8;
+      color: var(--success);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 6px 9px;
+    }
+
+    .badge.warn {
+      background: #fff1d9;
+      color: var(--warn);
+    }
+
+    .mode {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+      margin-top: 16px;
+    }
+
+    .mode label {
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--primary-2);
+    }
+
+    .temp-value {
+      min-width: 72px;
+      text-align: right;
+      font-weight: 700;
+      color: var(--primary-2);
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+
+    select,
+    button,
+    input {
+      font: inherit;
+    }
+
+    select {
+      min-width: 130px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      color: var(--text);
+    }
+
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+    button:active { transform: none; }
+
+    .primary {
+      background: var(--primary-2);
+      color: white;
+    }
+
+    .secondary {
+      background: #eaf1f3;
+      color: var(--primary);
+    }
+
+    #login {
+      max-width: 420px;
+      margin: 50px auto;
+      padding: 24px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+    }
+
+    #login h1 {
+      margin-top: 0;
+      margin-bottom: 8px;
+      font-size: 2rem;
+    }
+
+    #login-form {
+      display: grid;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    #login-form label {
+      display: grid;
+      gap: 7px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    #login-form input:not([type="range"]) {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      font: inherit;
+    }
+
+    #login-error {
+      color: var(--danger);
+      min-height: 1.4em;
+      margin: 0;
+      font-weight: 600;
+    }
+
+    #dashboard[hidden],
+    #login[hidden] {
+      display: none !important;
+    }
+
+    .solar-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+      margin: 14px 0;
+    }
+
+    .solar-metric {
+      background: var(--surface-soft);
+      border-radius: 9px;
+      padding: 13px;
+      border: 1px solid #e7eef1;
+    }
+
+    .solar-metric strong {
+      display: block;
+      margin-top: 6px;
+      font-size: 1.35rem;
+      color: var(--primary-2);
+    }
+
+    .forecast-wrap {
+      overflow-x: auto;
+    }
+
+    .forecast {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      text-align: left;
+    }
+
+    .forecast th,
+    .forecast td {
+      padding: 9px;
+      border-bottom: 1px solid #e5edef;
+      white-space: nowrap;
+    }
+
+    .forecast th {
+      color: var(--muted);
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .forecast td:last-child {
+      font-weight: 700;
+      color: var(--success);
+    }
+
+    #message {
+      min-height: 1.4em;
+      margin-top: 18px;
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    @media (max-width: 760px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .company {
+        text-align: left;
+      }
+
+      .card.wide {
+        grid-template-columns: 1fr;
+      }
+
+      .heading {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
   </style>
 </head>
 <body>
-  <header><div><strong>Thermal Cuve</strong><p>Gestion des températures de la résidence</p></div><div class="company"><div><strong class="company-name">Alp'Innov</strong><p>Innover pour économiser, préserver pour demain.</p></div><img class="company-logo" src="logo.png" alt="Logo Alp'Innov"></div></header>
+  <header>
+    <div>
+      <strong>Thermal Cuve</strong>
+      <p>Gestion des températures de la résidence</p>
+    </div>
+    <div class="company">
+      <div>
+        <strong class="company-name">Alp'Innov</strong>
+        <p>Innover pour économiser</p>
+      </div>
+    </div>
+  </header>
+
   <main>
-    <section id="login" style="max-width:420px;margin:50px auto;padding:24px;background:white;border:1px solid #dce6e9;border-radius:12px" aria-labelledby="login-title">
+    <section id="login" aria-labelledby="login-title">
       <h1 id="login-title">Connexion</h1>
       <p class="muted">Connectez-vous pour accéder au tableau de bord.</p>
-      <form id="login-form" style="display:grid;gap:12px">
-        <label>Adresse e-mail<input id="login-email" type="email" autocomplete="username" required></label>
-        <label>Mot de passe<input id="login-password" type="password" autocomplete="current-password" required></label>
+      <form id="login-form">
+        <label>
+          Adresse e-mail
+          <input id="login-email" type="email" autocomplete="username" required>
+        </label>
+        <label>
+          Mot de passe
+          <input id="login-password" type="password" autocomplete="current-password" required>
+        </label>
         <button class="primary" type="submit">Se connecter</button>
-        <p id="login-error" role="alert" aria-live="polite" style="color:#a32929;min-height:1.4em;margin:0"></p>
+        <p id="login-error" role="alert" aria-live="polite"></p>
         <p class="notice">Démo : demo@thermohabitat.fr / demo</p>
       </form>
     </section>
+
     <div id="dashboard" hidden>
-    <div class="heading"><h1>Résidence Les Tilleuls</h1><span class="online">● Système en ligne</span></div>
-    <section class="grid" aria-label="Commandes de chauffage">
-      <article class="card wide"><div><h2>Vue d’ensemble</h2><p class="muted">48 logements · 3 zones · Consigne générale : <strong id="general">20 °C</strong></p></div><div class="reading">8 °C <span style="font-size:.8rem;font-weight:500">extérieur</span></div></article>
-      <article class="card wide">
-        <div>
-          <section aria-labelledby="solar-title">
-            <div style="width:100%">
-              <h2 id="solar-title">Production solaire et pilotage</h2>
-              <p class="muted">Suivez l’énergie produite et anticipez le besoin de chauffage selon l’ensoleillement prévu.</p>
-              <div class="solar-summary">
-                <div class="solar-metric"><span class="muted">Production instantanée</span><strong id="solar-production">6,8 kW</strong></div>
-                <div class="solar-metric"><span class="muted">Ensoleillement actuel</span><strong id="solar-sun">540 W/m²</strong></div>
-                <div class="solar-metric"><span class="muted">Couverture estimée</span><strong id="solar-coverage">—</strong></div>
+      <div class="heading">
+        <h1>Résidence Les Tilleuls</h1>
+        <span class="online">● Système en ligne</span>
+      </div>
+
+      <section class="grid" aria-label="Commandes de chauffage">
+        <article class="card wide">
+          <div>
+            <h2>Vue d’ensemble</h2>
+            <p class="muted">48 logements · 3 zones · Consigne générale : <strong id="general">20 °C</strong></p>
+            <div class="reading">8,4 °C</div>
+            <p class="muted">Température extérieure moyenne</p>
+          </div>
+          <div style="display:grid;gap:8px;align-items:end">
+            <div class="muted" style="margin:0;">Batterie thermique : <strong>72 %</strong></div>
+            <div class="muted" style="margin:0;">Énergie solaire disponible : <strong>31 kWh</strong></div>
+            <div class="reading" style="font-size:1.1rem;color:var(--success);">Rendement global : +14 %</div>
+          </div>
+        </article>
+
+        <article class="card wide">
+          <div>
+            <section aria-labelledby="solar-title">
+              <div style="width:100%">
+                <h2 id="solar-title">Production solaire et pilotage</h2>
+                <p class="muted">Suivez l’énergie produite et anticipez le besoin de chauffage selon l’ensoleillement prévu.</p>
+
+                <div class="solar-summary">
+                  <div class="solar-metric">
+                    <span class="muted">Production instantanée</span>
+                    <strong id="solar-production">6,8 kW</strong>
+                  </div>
+                  <div class="solar-metric">
+                    <span class="muted">Ensoleillement actuel</span>
+                    <strong id="solar-sun">540 W/m²</strong>
+                  </div>
+                  <div class="solar-metric">
+                    <span class="muted">Couverture estimée</span>
+                    <strong id="solar-coverage">—</strong>
+                  </div>
+                </div>
+
+                <div class="forecast-wrap">
+                  <table class="forecast">
+                    <thead>
+                      <tr>
+                        <th>Heure</th>
+                        <th>Ensoleillement prévu</th>
+                        <th>Production prévue</th>
+                        <th>Chauffage estimé</th>
+                        <th>Besoin restant</th>
+                      </tr>
+                    </thead>
+                    <tbody id="solar-forecast"></tbody>
+                  </table>
+                </div>
+
+                <p class="notice">Données de démonstration : la production et la consommation sont des estimations, pas des mesures réelles.</p>
               </div>
-              <div class="forecast-wrap">
-                <table class="forecast">
-                  <thead><tr><th>Heure</th><th>Ensoleillement prévu</th><th>Production prévue</th><th>Chauffage estimé</th><th>Besoin restant</th></tr></thead>
-                  <tbody id="solar-forecast"></tbody>
-                </table>
-              </div>
-              <p class="notice">Données de démonstration : la production et la consommation sont des estimations, pas des mesures réelles.</p>
-            </div>
-          </section>
-          <h2>Gains du pilotage</h2>
-          <p class="muted">Comparaison du chauffage classique et du chauffage grâce à Thermal Cuve, à confort équivalent.</p>
-        </div>
-        <div style="display:grid;gap:8px;text-align:right;min-width:220px">
-          <div class="muted" style="margin:0;">Système classique : <strong>3 100 € / mois</strong></div>
-          <div class="muted" style="margin:0;">Thermal Cuve : <strong>2 480 € / mois</strong></div>
-          <div class="reading" style="font-size:1.1rem;color:#24764e;line-height:1.2;">Économie : 620 € / mois</div>
-          <div class="muted" style="margin:0;">Soit 7 440 € / an (estimation)</div>
-        </div>
-      </article>
-      <article class="card zone"><div class="zone-head"><h2>Bâtiment A</h2><span class="badge">Normal</span></div><p class="muted">16 logements · Mesurée : 20,4 °C</p><div class="mode"><label for="mode-a">Mode </label><select id="mode-a"><option>Automatique</option><option>Confort</option><option>Éco</option><option>Hors-gel</option></select></div><div class="control"><label for="temp-a">Consigne</label><input id="temp-a" type="range" min="16" max="24" step="0.5" value="20"><output for="temp-a">20 °C</output></div></article>
-      <article class="card zone"><div class="zone-head"><h2>Bâtiment B</h2><span class="badge warn">À vérifier</span></div><p class="muted">18 logements · Mesurée : 19,1 °C</p><div class="mode"><label for="mode-b">Mode </label><select id="mode-b"><option>Automatique</option><option>Confort</option><option>Éco</option><option>Hors-gel</option></select></div><div class="control"><label for="temp-b">Consigne</label><input id="temp-b" type="range" min="16" max="24" step="0.5" value="20"><output for="temp-b">20 °C</output></div></article>
-      <article class="card zone"><div class="zone-head"><h2>Bâtiment C</h2><span class="badge">Normal</span></div><p class="muted">14 logements · Mesurée : 20,0 °C</p><div class="mode"><label for="mode-c">Mode </label><select id="mode-c"><option>Automatique</option><option>Confort</option><option>Éco</option><option>Hors-gel</option></select></div><div class="control"><label for="temp-c">Consigne</label><input id="temp-c" type="range" min="16" max="24" step="0.5" value="20"><output for="temp-c">20 °C</output></div></article>
-      <article class="card wide"><div><h2>Consigne commune</h2><p class="muted">Régler la même température pour les trois bâtiments.</p></div><div class="actions"><label for="all-temp">Température</label><select id="all-temp"></select><button id="apply" class="primary">Appliquer à tous</button></div></article>
-    </section>
-    <p id="message" role="status" aria-live="polite"></p><p class="notice">Prototype d’interface : les commandes ne pilotent pas d’équipements réels. Vérifiez les réglages et les dispositifs de sécurité avec un professionnel avant toute mise en service.</p>
+            </section>
+          </div>
+
+          <div style="display:grid;gap:8px;text-align:right;min-width:220px">
+            <div class="muted" style="margin:0;">Système classique : <strong>3 100 € / mois</strong></div>
+            <div class="muted" style="margin:0;">Thermal Cuve : <strong>2 480 € / mois</strong></div>
+            <div class="reading" style="font-size:1.1rem;color:var(--success);line-height:1.2;">Économie : 620 € / mois</div>
+            <div class="muted" style="margin:0;">Soit 7 440 € / an (estimation)</div>
+          </div>
+        </article>
+
+        <article class="card zone">
+          <div class="zone-head">
+            <h2>Bâtiment A</h2>
+            <span class="badge">Normal</span>
+          </div>
+          <p class="muted">16 logements · Mesurée : 20,4 °C</p>
+          <div class="mode">
+            <label for="temp-a">Consigne</label>
+            <input id="temp-a" type="range" min="16" max="24" step="0.5" value="20">
+            <span class="temp-value">20,0 °C</span>
+          </div>
+        </article>
+
+        <article class="card zone">
+          <div class="zone-head">
+            <h2>Bâtiment B</h2>
+            <span class="badge warn">À vérifier</span>
+          </div>
+          <p class="muted">18 logements · Mesurée : 19,1 °C</p>
+          <div class="mode">
+            <label for="temp-b">Consigne</label>
+            <input id="temp-b" type="range" min="16" max="24" step="0.5" value="19.5">
+            <span class="temp-value">19,5 °C</span>
+          </div>
+        </article>
+
+        <article class="card zone">
+          <div class="zone-head">
+            <h2>Bâtiment C</h2>
+            <span class="badge">Normal</span>
+          </div>
+          <p class="muted">14 logements · Mesurée : 20,0 °C</p>
+          <div class="mode">
+            <label for="temp-c">Consigne</label>
+            <input id="temp-c" type="range" min="16" max="24" step="0.5" value="20">
+            <span class="temp-value">20,0 °C</span>
+          </div>
+        </article>
+
+        <article class="card wide">
+          <div>
+            <h2>Consigne commune</h2>
+            <p class="muted">Régler la même température pour les trois bâtiments.</p>
+          </div>
+          <div class="actions">
+            <label for="all-temp" class="muted">Température</label>
+            <select id="all-temp" aria-label="Température commune"></select>
+            <button type="button" class="primary" id="apply">Appliquer</button>
+            <button type="button" class="secondary" id="reset">Réinitialiser</button>
+          </div>
+        </article>
+      </section>
+
+      <p id="message" role="status" aria-live="polite"></p>
+      <p class="notice">Prototype d’interface : les commandes ne pilotent pas d’équipements réels. Vérifiez les réglages et les dispositifs de sécurité avant mise en service.</p>
     </div>
   </main>
+
   <script>
-    // Simulation côté navigateur uniquement ; ne protège pas de vraies données.
-    document.querySelector('#login-form').addEventListener('submit',event=>{
-      event.preventDefault();
-      const email=document.querySelector('#login-email').value.trim().toLowerCase();
-      const password=document.querySelector('#login-password').value;
-      if(email==='demo@thermohabitat.fr'&&password==='demo'){
-        document.querySelector('#login').hidden=true;
-        document.querySelector('#dashboard').hidden=false;
-      }else{
-        document.querySelector('#login-error').textContent='Identifiants incorrects.';
-      }
+    const loginForm = document.querySelector('#login-form');
+    const loginEmail = document.querySelector('#login-email');
+    const loginPassword = document.querySelector('#login-password');
+    const loginError = document.querySelector('#login-error');
+    const dashboard = document.querySelector('#dashboard');
+    const loginSection = document.querySelector('#login');
+
+    if (loginForm) {
+      loginForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const email = (loginEmail?.value || '').trim().toLowerCase();
+        const password = loginPassword?.value || '';
+
+        if (email === 'demo@thermohabitat.fr' && password === 'demo') {
+          if (loginSection) loginSection.hidden = true;
+          if (dashboard) dashboard.hidden = false;
+        } else {
+          if (loginError) loginError.textContent = 'Identifiants incorrects.';
+        }
+      });
+    }
+
+    const sliderValues = document.querySelectorAll('input[type="range"]');
+    const formatTemperature = (value) => `${Number(value).toLocaleString('fr-FR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} °C`;
+
+    sliderValues.forEach((slider) => {
+      const valueBox = slider.parentElement?.querySelector('.temp-value');
+      const update = () => {
+        if (valueBox) valueBox.textContent = formatTemperature(slider.value);
+      };
+
+      slider.addEventListener('input', update);
+      update();
     });
-    const sliders=[...document.querySelectorAll('input[type="range"]')];
-    const format=value=>`${Number(value).toLocaleString('fr-FR')} °C`;
-    sliders.forEach(slider=>slider.addEventListener('input',()=>{slider.nextElementSibling.value=format(slider.value)}));
-    const common=document.querySelector('#all-temp');
-    for(let t=16;t<=24;t+=.5){const option=document.createElement('option');option.value=t;option.textContent=format(t);if(t===20)option.selected=true;common.append(option)}
-    document.querySelector('#apply').addEventListener('click',()=>{sliders.forEach(slider=>{slider.value=common.value;slider.dispatchEvent(new Event('input'))});document.querySelector('#general').textContent=format(common.value);document.querySelector('#message').textContent=`Consigne ${format(common.value)} appliquée aux trois bâtiments.`});
-    const forecastData=[
-      {hour:'12 h',sun:82,production:8.2,consumption:5.4},
-      {hour:'13 h',sun:90,production:9.0,consumption:5.2},
-      {hour:'14 h',sun:74,production:7.4,consumption:5.6},
-      {hour:'15 h',sun:50,production:5.0,consumption:6.0},
-      {hour:'16 h',sun:22,production:2.2,consumption:6.5}
+
+    const commonSelect = document.querySelector('#all-temp');
+    if (commonSelect) {
+      for (let t = 16; t <= 24; t += 0.5) {
+        const option = document.createElement('option');
+        option.value = String(t);
+        option.textContent = formatTemperature(t);
+        if (t === 20) option.selected = true;
+        commonSelect.appendChild(option);
+      }
+    }
+
+    const generalTemp = document.querySelector('#general');
+    const applyButton = document.querySelector('#apply');
+    if (applyButton) {
+      applyButton.addEventListener('click', () => {
+        const selected = commonSelect ? commonSelect.value : '20';
+
+        sliderValues.forEach((slider) => {
+          slider.value = selected;
+          slider.dispatchEvent(new Event('input'));
+        });
+
+        if (generalTemp) {
+          generalTemp.textContent = formatTemperature(selected);
+        }
+
+        const message = document.querySelector('#message');
+        if (message) message.textContent = `Consigne appliquée à ${formatTemperature(selected)} pour les trois bâtiments.`;
+      });
+    }
+
+    const resetButton = document.querySelector('#reset');
+    if (resetButton) {
+      resetButton.addEventListener('click', () => {
+        sliderValues.forEach((slider) => {
+          slider.value = '20';
+          slider.dispatchEvent(new Event('input'));
+        });
+
+        if (commonSelect) commonSelect.value = '20';
+        if (generalTemp) generalTemp.textContent = '20 °C';
+
+        const message = document.querySelector('#message');
+        if (message) message.textContent = 'Réglages réinitialisés à la consigne standard.';
+      });
+    }
+
+    const forecastData = [
+      { hour: '12 h', sun: 82, production: 8.2, consumption: 5.4 },
+      { hour: '13 h', sun: 90, production: 9.0, consumption: 5.2 },
+      { hour: '14 h', sun: 74, production: 7.4, consumption: 5.6 },
+      { hour: '15 h', sun: 50, production: 5.0, consumption: 6.0 },
+      { hour: '16 h', sun: 22, production: 2.2, consumption: 6.5 }
     ];
-    const numberFr=value=>Number(value).toLocaleString('fr-FR',{maximumFractionDigits:1});
-    document.querySelector('#solar-forecast').innerHTML=forecastData.map(item=>{
-      const remaining=Math.max(0,item.consumption-item.production);
-      return `<tr>
-        <td>${item.hour}</td>
-        <td>${item.sun} %</td>
-        <td>${numberFr(item.production)} kW</td>
-        <td>${numberFr(item.consumption)} kW</td>
-        <td>${numberFr(remaining)} kW</td>
-      </tr>`;
-    }).join('');
-    const averageCoverage=forecastData.reduce((sum,item)=>
-      sum+Math.min(item.production/item.consumption,1),0)/forecastData.length*100;
-    document.querySelector('#solar-coverage').textContent=`${numberFr(averageCoverage)} %`
+
+    const numberFr = (value) => Number(value).toLocaleString('fr-FR', { maximumFractionDigits: 1 });
+    const solarForecast = document.querySelector('#solar-forecast');
+
+    if (solarForecast) {
+      solarForecast.innerHTML = forecastData.map((item) => {
+        const remaining = Math.max(0, item.consumption - item.production);
+        return `
+          <tr>
+            <td>${item.hour}</td>
+            <td>${item.sun} %</td>
+            <td>${numberFr(item.production)} kW</td>
+            <td>${numberFr(item.consumption)} kW</td>
+            <td>${numberFr(remaining)} kW</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    const averageCoverage = forecastData.reduce((sum, item) => sum + Math.min(item.production / item.consumption, 1), 0) / forecastData.length * 100;
+    const solarCoverage = document.querySelector('#solar-coverage');
+    if (solarCoverage) {
+      solarCoverage.textContent = `${numberFr(averageCoverage)} %`;
+    }
   </script>
 </body>
 </html>
